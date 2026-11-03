@@ -35,3 +35,12 @@ Les fiches sont conservées dans la clé localStorage historique `ma-chambre-inv
 - Bibliothèques QR/caméra indisponibles : vérifier la connexion aux CDN.
 - Recherche produit absente : Open Food Facts ne référence pas nécessairement votre objet.
 - Images absentes : URL non accessible, blocage anti-hotlink ou image supprimée.
+
+
+## Version V3 — navigation séparée
+- **Accueil = Inventaire** (`#inventaire`).
+- **Ajouter / modifier** (`#edition`) est une vue distincte accessible depuis le menu latéral et chaque fiche.
+- Après validation du formulaire, retour automatique à l’inventaire avec confirmation.
+- Le scan LENVII conserve ses fonctions et peut ouvrir directement le formulaire.
+- Les anciennes données `ma-chambre-inventaire-v1` et sauvegardes V2 sont conservées.
+- `navigation.js` est nécessaire et doit être envoyé sur GitHub Pages avec les autres fichiers.
