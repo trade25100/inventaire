@@ -56,3 +56,21 @@ $('usbEdit').onclick=()=>{if(!usbCurrent)return;for(const k of ['id','name','cod
 $('usbNew').onclick=()=>{const code=usbLast;resetForm();$('code').value=code;usbMessage('Code ajouté au formulaire : complétez le nom et l’emplacement.');$('form').scrollIntoView({behavior:'smooth',block:'center'});$('name').focus()};
 
 load();render();const requested=new URLSearchParams(location.search).get('objet');if(requested){const x=data.find(x=>x.id===requested);if(x){$('search').value=x.name;render()}else setTimeout(()=>alert('Objet non trouvé dans ce navigateur. Importez la sauvegarde JSON correspondante.'),200)}
+
+// Navigation aside et résumé dynamique — sans modifier le stockage existant.
+function updateSidebar(){
+ $('sideTypes').textContent=data.length;
+ $('sideQty').textContent=data.reduce((sum,x)=>sum+x.qty,0);
+ $('sideLow').textContent=data.filter(x=>x.qty<=2).length;
+ const counts=new Map();data.forEach(x=>{if(x.location)counts.set(x.location,(counts.get(x.location)||0)+x.qty)});
+ const container=$('sideLocations');container.replaceChildren();
+ const all=document.createElement('button');all.type='button';all.textContent='Tous les emplacements';all.onclick=()=>selectSidebarLocation('');container.append(all);
+ [...counts.entries()].sort((a,b)=>a[0].localeCompare(b[0],'fr')).forEach(([loc,n])=>{const b=document.createElement('button');b.type='button';b.textContent=loc+' ('+n+')';b.onclick=()=>selectSidebarLocation(loc);container.append(b)});
+}
+function selectSidebarLocation(loc){$('filterLocation').value=loc;render();document.getElementById('inventaire').scrollIntoView({behavior:'smooth'});document.body.classList.remove('sidebar-open')}
+const previousRender=render;render=function(){previousRender();updateSidebar()};
+$('openSidebar').onclick=()=>document.body.classList.add('sidebar-open');
+$('closeSidebar').onclick=()=>document.body.classList.remove('sidebar-open');
+document.querySelectorAll('.side-nav a').forEach(a=>a.addEventListener('click',()=>document.body.classList.remove('sidebar-open')));
+$('sideExport').onclick=()=>$('export').click();
+updateSidebar();
