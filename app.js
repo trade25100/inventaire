@@ -24,15 +24,26 @@ let usbEnabled=false,usbTimer=null,usbLast='',usbCurrent=null,usbHandledAt=0;
 const usbInput=$('usbInput');
 function usbMessage(message){$('usbStatus').textContent=message}
 function usbFocus(){if(usbEnabled && document.activeElement!==usbInput)usbInput.focus()}
+// Convertit les frappes de la rangée numérique QWERTY interprétées en AZERTY FR.
+// Ne modifie jamais un QR alphanumérique : correction limitée aux chaînes
+// entièrement composées de chiffres et des symboles AZERTY correspondants.
+const azertyDigits={'&':'1','é':'2','"':'3',"'":'4','(':'5','-':'6','è':'7','_':'8','ç':'9','à':'0'};
+function normalizeUsbCode(raw){
+ const value=String(raw||'').replace(/[\r\n]+$/g,'').trim();
+ if(!$('usbAzerty').checked || !value || !/[&é"'()è_çà]/.test(value))return value;
+ if(!/^[0-9&é"'()\-è_çà]+$/.test(value))return value;
+ return Array.from(value,c=>azertyDigits[c]??c).join('');
+}
 function usbLookup(raw){
- const code=String(raw||'').replace(/[\r\n]+$/g,'').trim();
+ const original=String(raw||'').replace(/[\r\n]+$/g,'').trim();
+ const code=normalizeUsbCode(original);
  if(!code)return;
  if(code===usbLast && Date.now()-usbHandledAt<900)return;
  usbLast=code;usbHandledAt=Date.now();clearTimeout(usbTimer);
  const item=data.find(x=>x.code===code);usbCurrent=item||null;
  $('usbResult').hidden=false;
- if(item){$('usbInfo').textContent='✓ Trouvé : '+item.name+' — '+item.location+' — Quantité : '+item.qty+' — Code : '+code;$('usbPlus').hidden=false;$('usbEdit').hidden=false;$('usbNew').hidden=true;usbMessage('Code reconnu. Vous pouvez ajouter 1 unité ou modifier sa fiche.');}
- else{$('usbInfo').textContent='Code inconnu : '+code+'. Créez une fiche pour cet objet.';$('usbPlus').hidden=true;$('usbEdit').hidden=true;$('usbNew').hidden=false;usbMessage('Nouveau code détecté.');}
+ if(item){$('usbInfo').textContent='✓ Trouvé : '+item.name+' — '+item.location+' — Quantité : '+item.qty+' — Code : '+code;$('usbPlus').hidden=false;$('usbEdit').hidden=false;$('usbNew').hidden=true;usbMessage((code!==original?'AZERTY corrigé : '+original+' → '+code+'. ':'')+'Code reconnu. Vous pouvez ajouter 1 unité ou modifier sa fiche.');}
+ else{$('usbInfo').textContent='Code inconnu : '+code+'. Créez une fiche pour cet objet.';$('usbPlus').hidden=true;$('usbEdit').hidden=true;$('usbNew').hidden=false;usbMessage((code!==original?'AZERTY corrigé : '+original+' → '+code+'. ':'')+'Nouveau code détecté.');}
  usbInput.value='';
 }
 $('usbActivate').onclick=()=>{usbEnabled=true;usbFocus();usbMessage('Scan USB activé. Présentez un code au LENVII.');};

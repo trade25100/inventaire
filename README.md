@@ -36,3 +36,7 @@ Site statique pour inventorier les objets de votre chambre : nom, quantité, cod
 5. Si possible, activer le suffixe **Enter / CR** sur le scanner. Sans suffixe, le site attend 450 ms après la dernière frappe.
 
 Le navigateur reçoit les codes comme du texte saisi au clavier ; aucune API USB spéciale n'est nécessaire. Laisser le curseur dans le champ « Code lu par le scanner » pendant le scan. Les QR contenant des URL sont traités comme des codes texte. Le scanner n'identifie pas automatiquement le nom du produit : celui-ci doit être saisi dans la fiche.
+
+## Correction automatique AZERTY / QWERTY
+
+Dans la section Scanner USB, cochez **Corriger automatiquement les chiffres reçus en AZERTY**. Les caractères `& é " ' ( - è _ ç à` sont convertis respectivement en `1 2 3 4 5 6 7 8 9 0` **uniquement** si le code complet ressemble à une suite numérique mal interprétée. Le code corrigé est utilisé pour la recherche et l'enregistrement. Désactivez l'option pour les QR textuels ou les codes contenant réellement des tirets ou symboles : ces cas peuvent être ambigus. La meilleure solution reste de régler le scanner sur **French / AZERTY** dans son manuel.
